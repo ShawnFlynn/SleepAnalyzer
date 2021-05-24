@@ -23,7 +23,7 @@ import java.io.File;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicReference;
 
-import com.choosemuse.example.libmuse.R;
+//import com.choosemuse.example.libmuse.R;
 import com.choosemuse.libmuse.Accelerometer;
 import com.choosemuse.libmuse.AnnotationData;
 import com.choosemuse.libmuse.ConnectionState;
@@ -372,16 +372,8 @@ public class MainActivity extends Activity implements OnClickListener {
 		} else {
 			Log.w(method, "test file doesn't exist");
 
-			// Check for faulty API
-			//	API 17 (4.2) &
-			//	API 18 (4.3) &
-			//	API 22 (5.1) &
-			//	API 25 (7.1)
-			// has problem with this audioFeedbackThread
-			if (!android.os.Build.VERSION.RELEASE.startsWith("4.2.") &&
-				!android.os.Build.VERSION.RELEASE.startsWith("4.3.") &&
-				!android.os.Build.VERSION.RELEASE.startsWith("5.1.") &&
-				!android.os.Build.VERSION.RELEASE.startsWith("7.1.")) {
+			// Check for faulty Tone Generator
+			if (goodToneGenerator()) {
 				//kt:
 				// start the audio feedback thread
 				Thread audioFeedbackThread = new Thread(new Runnable() {
@@ -398,17 +390,9 @@ public class MainActivity extends Activity implements OnClickListener {
 		}
 		// RB
 
-		// Check for faulty APIs
-		//	API 17 (4.2) &
-		//	API 18 (4.3) &
-		//	API 22 (5.1) &
-		//	API 25 (7.1)
-		//	have faulty Tone Generator support
-		if (!android.os.Build.VERSION.RELEASE.startsWith("4.2.") &&
-			!android.os.Build.VERSION.RELEASE.startsWith("4.3.") &&
-			!android.os.Build.VERSION.RELEASE.startsWith("5.1.") &&
-			!android.os.Build.VERSION.RELEASE.startsWith("7.1.")) {
-			// kt: initial audio test
+		// Check for faulty Tone Generator
+		if (goodToneGenerator()) {
+			// kt: begin audio test
 			Log.d("Muse Headband", "sound test start");
 			stopSounds = 0;
 			playAudioFeedback(1);
@@ -417,6 +401,18 @@ public class MainActivity extends Activity implements OnClickListener {
 		}
 
 	}    // end - onCreate()
+
+	private boolean goodToneGenerator() {
+
+		// Return "true" if known good Tone Generator
+		return  (!android.os.Build.VERSION.RELEASE.startsWith("4.1.") && // API 16
+				 !android.os.Build.VERSION.RELEASE.startsWith("4.2.") && // API 17
+				 !android.os.Build.VERSION.RELEASE.startsWith("4.3.") && // API 18
+				 !android.os.Build.VERSION.RELEASE.startsWith("4.4.") && // API 19
+				 !android.os.Build.VERSION.RELEASE.startsWith("5.1.") && // API 22
+				 !android.os.Build.VERSION.RELEASE.startsWith("7.1."));  // API 25
+
+	}
 
 	protected void onPause() {
 		super.onPause();
